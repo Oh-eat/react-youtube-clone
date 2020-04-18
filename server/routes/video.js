@@ -23,6 +23,16 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage }).single("file");
 
+router.get("/getvideo/:videoId", (req, res) => {
+  const { videoId } = req.params;
+  Video.findById(videoId)
+    .populate("writer")
+    .exec((err, video) => {
+      if (err) return res.json({ success: false });
+      res.status(200).json({ success: true, video });
+    });
+});
+
 router.get("/getvideos", (req, res) => {
   Video.find()
     .populate("writer")
