@@ -3,6 +3,7 @@ import { Button, Form, message, Input, Icon } from "antd";
 import Title from "antd/lib/typography/Title";
 import TextArea from "antd/lib/input/TextArea";
 import Dropzone from "react-dropzone";
+import Axios from "axios";
 
 const privateOptions = [
   {
@@ -44,7 +45,23 @@ function VideoUploadPage(props) {
 
   const handleChange = useCallback((e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    setForm((state) => ({ ...state, [name]: value }));
+  }, []);
+
+  const handleDrop = useCallback((files) => {
+    let formData = new FormData();
+    const config = {
+      header: { "Content-Type": "multipart/form-data" },
+    };
+    formData.append("file", files[0]);
+
+    Axios.post("/api/video/uploadfiles", formData, config).then((response) => {
+      if (response.data.success) {
+        console.log(response.data);
+      } else {
+        alert("비디오 업로드가 실패하였습니다.");
+      }
+    });
   }, []);
 
   return (
@@ -54,7 +71,7 @@ function VideoUploadPage(props) {
       </div>
       <Form>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <Dropzone onDrop multiple maxSize>
+          <Dropzone onDrop={handleDrop} multiple={false} maxSize={1000000000}>
             {({ getRootProps, getInputProps }) => (
               <div
                 style={{
@@ -72,9 +89,7 @@ function VideoUploadPage(props) {
               </div>
             )}
           </Dropzone>
-          <div>
-            <img src alt />
-          </div>
+          <div>{/* <img src alt /> */}</div>
         </div>
         <br />
         <br />
