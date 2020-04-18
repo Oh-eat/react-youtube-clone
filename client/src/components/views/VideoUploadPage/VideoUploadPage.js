@@ -36,6 +36,7 @@ const categoryOptions = [
 ];
 
 function VideoUploadPage(props) {
+  const [thumbnail, setThumbnail] = useState(null);
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -57,9 +58,20 @@ function VideoUploadPage(props) {
 
     Axios.post("/api/video/uploadfiles", formData, config).then((response) => {
       if (response.data.success) {
-        console.log(response.data);
+        const fileInfo = {
+          url: response.data.url,
+          fileName: response.data.fileName,
+        };
+
+        Axios.post("/api/video/thumbnail", fileInfo).then((response) => {
+          if (response.data.success) {
+            setThumbnail(`http://localhost:5000/${response.data.url}`);
+          } else {
+            alert("썸네일 생성에 실패하였습니다.");
+          }
+        });
       } else {
-        alert("비디오 업로드가 실패하였습니다.");
+        alert("비디오 업로드에 실패하였습니다.");
       }
     });
   }, []);
@@ -89,7 +101,7 @@ function VideoUploadPage(props) {
               </div>
             )}
           </Dropzone>
-          <div>{/* <img src alt /> */}</div>
+          <div>{thumbnail && <img src={thumbnail} alt="thumbnail" />}</div>
         </div>
         <br />
         <br />
