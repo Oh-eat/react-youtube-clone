@@ -3,9 +3,8 @@ const router = express.Router();
 const path = require("path");
 const multer = require("multer");
 const ffmpeg = require("fluent-ffmpeg");
-// const { Video } = require("../models/Video");
+const { Video } = require("../models/Video");
 const { auth } = require("../middleware/auth");
-const BASE_PATH = "server/uploads";
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -16,8 +15,8 @@ const storage = multer.diskStorage({
   },
   filefilter: (req, file, cb) => {
     const ext = path.extname(file.originalname);
-    if (ext !== "mp4") {
-      return cb(res.status(400).end("only mp4 is allowed"), false);
+    if (ext !== "mp4" && ext !== "webm") {
+      return cb(res.status(400).end("only mp4, webm is allowed"), false);
     }
   },
 });
@@ -30,7 +29,7 @@ router.post("/uploadfiles", (req, res) => {
     return res.json({
       success: true,
       url: res.req.file.path,
-      fileName: res.req.file.filename,
+      fileName: "uploads/" + res.req.file.filename,
     });
   });
 });
@@ -60,6 +59,15 @@ router.post("/thumbnail", (req, res) => {
       size: "320x240",
       filename: "thumbnail-%b.png",
     });
+});
+
+router.post("/uploadvideo", (req, res) => {
+  const video = new Video(req.body);
+
+  video.save((err, doc) => {
+    if (err) return res.json({ success: false, err });
+    res.status(200).json({ success: true });
+  });
 });
 
 module.exports = router;

@@ -4,8 +4,10 @@ import Title from "antd/lib/typography/Title";
 import TextArea from "antd/lib/input/TextArea";
 import Dropzone from "react-dropzone";
 import Axios from "axios";
+import { useSelector } from "react-redux";
+import { withRouter } from "react-router-dom";
 
-const privateOptions = [
+const privacyOptions = [
   {
     value: 0,
     label: "public",
@@ -36,11 +38,16 @@ const categoryOptions = [
 ];
 
 function VideoUploadPage(props) {
-  const [thumbnail, setThumbnail] = useState(null);
+  const user = useSelector((state) => state.user);
+  const [video, setVideo] = useState({
+    filePath: null,
+    duration: null,
+    thumbnail: null,
+  });
   const [form, setForm] = useState({
     title: "",
     description: "",
-    private: 0,
+    privacy: 0,
     category: 0,
   });
 
@@ -65,7 +72,11 @@ function VideoUploadPage(props) {
 
         Axios.post("/api/video/thumbnail", fileInfo).then((response) => {
           if (response.data.success) {
-            setThumbnail(`http://localhost:5000/${response.data.url}`);
+            setVideo({
+              filePath: `http://localhost:5000/${fileInfo.fileName}`,
+              thumbnail: `http://localhost:5000/${response.data.url}`,
+              duration: response.data.fileDuration,
+            });
           } else {
             alert("썸네일 생성에 실패하였습니다.");
           }
@@ -75,6 +86,34 @@ function VideoUploadPage(props) {
       }
     });
   }, []);
+
+  const handleSubmit = useCallback(
+    (e) => {
+      e.preventDefault();
+      const { title, description, privacy, category } = form;
+      const { filePath, duration, thumbnail } = video;
+      const submitInfo = {
+        writer: user.userData._id,
+        title,
+        description,
+        privacy,
+        category,
+        filePath,
+        duration,
+        thumbnail,
+      };
+
+      Axios.post("/api/video/uploadVideo", submitInfo).then((response) => {
+        if (response.data.success) {
+          message.success("비디오 업로드가 완료되었습니다.");
+          props.history.push("/");
+        } else {
+          alert("비디오 업로드에 실패했습니다.");
+        }
+      });
+    },
+    [form, video]
+  );
 
   return (
     <div style={{ maxWidth: "700px", margin: "2rem auto" }}>
@@ -101,7 +140,9 @@ function VideoUploadPage(props) {
               </div>
             )}
           </Dropzone>
-          <div>{thumbnail && <img src={thumbnail} alt="thumbnail" />}</div>
+          <div>
+            {video.thumbnail && <img src={video.thumbnail} alt="thumbnail" />}
+          </div>
         </div>
         <br />
         <br />
@@ -117,10 +158,10 @@ function VideoUploadPage(props) {
         />
         <br />
         <br />
-        <select name="private" onChange={handleChange} value={form.private}>
-          {privateOptions.map((privateOption, index) => (
-            <option key={index} value={privateOption.value}>
-              {privateOption.label}
+        <select name="privacy" onChange={handleChange} value={form.privacy}>
+          {privacyOptions.map((privacyOption, index) => (
+            <option key={index} value={privacyOption.value}>
+              {privacyOption.label}
             </option>
           ))}
         </select>
@@ -135,10 +176,12 @@ function VideoUploadPage(props) {
         </select>
         <br />
         <br />
-        <Button type="primary">Submit</Button>
+        <Button type="primary" onClick={handleSubmit}>
+          Submit
+        </Button>
       </Form>
     </div>
   );
 }
 
-export default VideoUploadPage;
+export default withRouter(VideoUploadPage);
