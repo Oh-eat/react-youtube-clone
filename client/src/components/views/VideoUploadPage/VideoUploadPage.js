@@ -112,7 +112,7 @@ function VideoUploadPage(props) {
         }
       });
     },
-    [form, video]
+    [form, video, props.history, user]
   );
 
   return (
