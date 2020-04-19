@@ -2,6 +2,7 @@
 /build
 /ffmpeg
 server/uploads
+/sample_videos
 
 dev.js
 
