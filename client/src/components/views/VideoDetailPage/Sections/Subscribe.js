@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import Axios from "axios";
-import { message } from "antd";
 
 function Subscribe({ userTo }) {
   const [subscriberNumber, setSubscriberNumber] = useState(null);
