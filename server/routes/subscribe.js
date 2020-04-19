@@ -16,12 +16,27 @@ router.post("/subscribed", (req, res) => {
   const { userTo, userFrom } = req.body;
   Subscriber.find({ userTo, userFrom }).exec((err, subscribed) => {
     if (err) res.status(400).json({ success: false, err });
-    res
-      .status(200)
-      .json({
-        success: true,
-        subscribed: subscribed.length > 0 ? true : false,
-      });
+    res.status(200).json({
+      success: true,
+      subscribed: subscribed.length > 0 ? true : false,
+    });
+  });
+});
+
+router.post("/subscribe", (req, res) => {
+  const subscriber = new Subscriber(req.body);
+  subscriber.save((err, doc) => {
+    if (err) res.status(400).json({ success: false, err });
+    res.status(200).json({ success: true, doc });
+  });
+});
+
+router.post("/unsubscribe", (req, res) => {
+  const { userTo, userFrom } = req.body;
+
+  Subscriber.findOneAndDelete({ userTo, userFrom }).exec((err, result) => {
+    if (err) return res.status(400).json({ success: false, err });
+    res.status(200).json({ success: true, result });
   });
 });
 

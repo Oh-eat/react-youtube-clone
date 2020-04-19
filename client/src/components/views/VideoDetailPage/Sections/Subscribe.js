@@ -1,11 +1,37 @@
 import React, { useEffect, useState } from "react";
 import Axios from "axios";
+import { message } from "antd";
 
 function Subscribe({ userTo }) {
   const [subscriberNumber, setSubscriberNumber] = useState(null);
   const [subscribed, setSubscribed] = useState(null);
 
-  const handleClick = () => {};
+  const handleClick = () => {
+    const requestBody = {
+      userTo,
+      userFrom: localStorage.getItem("userId"),
+    };
+
+    if (subscribed) {
+      Axios.post("/api/subscribe/unsubscribe", requestBody).then((response) => {
+        if (response.data.success) {
+          setSubscribed(false);
+          setSubscriberNumber(subscriberNumber - 1);
+        } else {
+          alert("구독 취소에 실패하였습니다.");
+        }
+      });
+    } else {
+      Axios.post("/api/subscribe/subscribe", requestBody).then((response) => {
+        if (response.data.success) {
+          setSubscribed(true);
+          setSubscriberNumber(subscriberNumber + 1);
+        } else {
+          alert("구독에 실패하였습니다.");
+        }
+      });
+    }
+  };
 
   useEffect(() => {
     Axios.post("/api/subscribe/subscribenumber", { userTo }).then(
