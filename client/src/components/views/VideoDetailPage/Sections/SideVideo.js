@@ -18,7 +18,7 @@ const renderSideVideo = (sideVideos) =>
           marginRight: "1rem",
         }}
       >
-        <a href="">
+        <a href={`/video/${sideVideo._id}`}>
           <img
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
             src={sideVideo.thumbnail}
@@ -27,7 +27,7 @@ const renderSideVideo = (sideVideos) =>
         </a>
       </div>
       <div style={{ width: "50%" }}>
-        <a href="" style={{ color: "gray" }}>
+        <a href={`/video/${sideVideo._id}`} style={{ color: "gray" }}>
           <span style={{ fontSize: "1rem", color: "black" }}>
             {sideVideo.title}
           </span>

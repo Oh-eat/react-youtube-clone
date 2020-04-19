@@ -5,7 +5,6 @@ const multer = require("multer");
 const ffmpeg = require("fluent-ffmpeg");
 const { Video } = require("../models/Video");
 const { Subscriber } = require("../models/Subscriber");
-const { auth } = require("../middleware/auth");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -27,7 +26,7 @@ const upload = multer({ storage: storage }).single("file");
 router.get("/getvideo/:videoId", (req, res) => {
   const { videoId } = req.params;
   Video.findById(videoId)
-    .populate("writer")
+    .populate("writer", "_id image name")
     .exec((err, video) => {
       if (err) return res.json({ success: false });
       res.status(200).json({ success: true, video });
@@ -36,7 +35,7 @@ router.get("/getvideo/:videoId", (req, res) => {
 
 router.get("/getvideos", (req, res) => {
   Video.find()
-    .populate("writer")
+    .populate("writer", "_id image name")
     .exec((err, videos) => {
       if (err) return res.status(400).json({ success: false, err });
       res.status(200).json({ success: true, videos });
@@ -49,7 +48,7 @@ router.get("/getsubscriptionvideos/:userFrom", (req, res) => {
     if (err) return res.status(400).json({ success: false, err });
     writerIds = subscribes.map((subscribe) => subscribe.userTo);
     Video.find({ writer: { $in: writerIds } })
-      .populate("writer")
+      .populate("writer", "_id image name")
       .exec((err, videos) => {
         if (err) return res.status(400).json({ success: false, err });
         res.status(200).json({ success: true, videos });

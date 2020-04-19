@@ -24,6 +24,8 @@ router.post("/subscribed", (req, res) => {
 });
 
 router.post("/subscribe", (req, res) => {
+  if (req.body.userTo === req.body.userFrom)
+    return res.status(400).json({ success: false, err });
   const subscriber = new Subscriber(req.body);
   subscriber.save((err, doc) => {
     if (err) res.status(400).json({ success: false, err });
