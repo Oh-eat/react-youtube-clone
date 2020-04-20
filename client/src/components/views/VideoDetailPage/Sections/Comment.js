@@ -44,7 +44,7 @@ function Comment({ video }) {
         }
       });
     },
-    [commentText]
+    [commentText, refreshAfterInsert, video]
   );
 
   useEffect(() => {
@@ -55,7 +55,7 @@ function Comment({ video }) {
         alert("댓글 조회에 실패하였습니다.");
       }
     });
-  }, []);
+  }, [video]);
 
   return (
     <div>

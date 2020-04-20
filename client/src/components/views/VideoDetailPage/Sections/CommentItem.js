@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from "react";
-import { Comment, Avatar, Button, Input } from "antd";
+import { Comment, Avatar } from "antd";
 import Axios from "axios";
+import LikeDislike from "./LikeDislike";
 
 function CommentItem({
   comment,
@@ -49,10 +50,14 @@ function CommentItem({
         }
       });
     },
-    [replyText]
+    [replyText, comment, video, refreshAfterInsert]
   );
 
   const actions = [
+    localStorage.getItem("userId") &&
+      comment.writer._id !== localStorage.getItem("userId") && (
+        <LikeDislike commentId={comment._id} />
+      ),
     <span onClick={handleReplyAdd}>Reply to</span>,
     replies.length > 0 && (
       <span onClick={handleRepliesShow}>

@@ -5,10 +5,17 @@ import { withRouter } from "react-router-dom";
 import SideVideo from "./Sections/SideVideo";
 import Subscribe from "./Sections/Subscribe";
 import Comment from "./Sections/Comment";
+import LikeDislike from "./Sections/LikeDislike";
 
 function VideoDetailPage(props) {
   const [video, setVideo] = useState(null);
+  const LikeDislikeButton = video &&
+    localStorage.getItem("userId") &&
+    video.writer._id !== localStorage.getItem("userId") && (
+      <LikeDislike videoId={video._id} />
+    );
   const SubscribeButton = video &&
+    localStorage.getItem("userId") &&
     video.writer._id !== localStorage.getItem("userId") && (
       <Subscribe userTo={video.writer._id} />
     );
@@ -31,7 +38,7 @@ function VideoDetailPage(props) {
       <Col lg={18} xs={24}>
         <div style={{ width: "100%", padding: "3rem 4rem" }}>
           <video style={{ width: "100%" }} src={video.filePath} controls />
-          <List.Item actions={[SubscribeButton]}>
+          <List.Item actions={[LikeDislikeButton, SubscribeButton]}>
             <List.Item.Meta
               avatar={<Avatar src={video.writer.image} />}
               title={video.writer.name}
